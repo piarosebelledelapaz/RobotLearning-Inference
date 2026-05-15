@@ -1,0 +1,155 @@
+# RobotLearning Inference
+
+Reproducible inference setup for the SO101 follower towel-folding policy.
+
+## What is stored in Git
+
+- Inference scripts: `test_policy.py`, `move_to_start_pose.py`
+- Robot calibration: `calibration/`
+- Fixed start pose: `fixed_start_pose.json`
+
+Large generated assets are intentionally not stored in Git:
+
+- `artifacts/` for downloaded policy checkpoints and optional datasets
+- `outputs/` for local recordings and training output
+- `dataset/` for local LeRobot datasets
+
+## Artifact layout
+
+Put the inference checkpoint here:
+
+```text
+artifacts/
+  policies/
+    clippatch16_batch32_030000/
+      config.json
+      model.safetensors
+      policy_postprocessor.json
+      policy_postprocessor_step_0_unnormalizer_processor.safetensors
+      policy_preprocessor.json
+      policy_preprocessor_step_4_normalizer_processor.safetensors
+      train_config.json
+```
+
+For inference, you need only the `pretrained_model` files above. You do not need
+`training_state/optimizer_state.safetensors`.
+
+If you also want the training/evaluation dataset locally, put it at:
+
+```text
+artifacts/
+  datasets/
+    so101_plain/
+      data/
+      meta/
+      videos/
+```
+
+## Linux setup
+
+1. Clone the repo.
+
+```bash
+git clone <repo-url>
+cd RobotLearning-Inference
+```
+
+2. Create the conda environment.
+
+```bash
+conda env create -f environment.yml
+conda activate robotlearning-inference
+```
+
+3. Install FFmpeg and camera/USB support.
+
+```bash
+sudo apt-get update
+sudo apt-get install -y v4l-utils
+```
+
+4. Download the checkpoint from Hugging Face into `artifacts/policies/clippatch16_batch32_030000/`.
+
+Use exact Hugging Face revisions, preferably commit hashes, not floating branch
+names like `main`.
+
+```bash
+python scripts/download_from_hf.py \
+  --policy-repo-id piarosebelledelapaz/multitask-dit-so101-plain \
+  --policy-revision <model-commit-hash>
+```
+
+If you also need the dataset locally, download it in the same reproducible step:
+
+```bash
+python scripts/download_from_hf.py \
+  --policy-repo-id piarosebelledelapaz/multitask-dit-so101-plain \
+  --policy-revision <model-commit-hash> \
+  --dataset-repo-id <your-hf-username-or-org>/<dataset-repo-name> \
+  --dataset-revision <dataset-commit-hash>
+```
+
+Then verify the files:
+
+```bash
+cd artifacts/policies/clippatch16_batch32_030000
+sha256sum -c ../../../manifests/clippatch16_batch32_030000.sha256
+cd -
+```
+
+5. Check the robot and camera device names.
+
+```bash
+ls /dev/ttyACM* /dev/ttyUSB*
+v4l2-ctl --list-devices
+```
+
+6. Move the robot to the reproducible start pose.
+
+```bash
+python move_to_start_pose.py --port /dev/ttyACM0
+```
+
+7. Run inference.
+
+```bash
+python test_policy.py \
+  --robot-port /dev/ttyACM0 \
+  --camera-index 0 \
+  --policy-path artifacts/policies/clippatch16_batch32_030000 \
+  --device cuda \
+  --vcodec libx264
+```
+
+Use `--vcodec h264_nvenc` only on machines where FFmpeg can see an NVIDIA
+hardware encoder. `libx264` is slower but more portable.
+
+## Environment variables
+
+The same values can be provided as environment variables:
+
+```bash
+export POLICY_PATH=artifacts/policies/clippatch16_batch32_030000
+export ROBOT_PORT=/dev/ttyACM0
+export ROBOT_ID=robot_learning_follower
+export CAMERA_INDEX=0
+export CAMERA_FPS=30
+export POLICY_DEVICE=cuda
+export DATASET_VCODEC=libx264
+python test_policy.py
+```
+
+## Reproducibility checklist
+
+- Commit the code and calibration JSONs.
+- Store the checkpoint and dataset on Hugging Face.
+- Use Hugging Face commit hashes for `--policy-revision` and `--dataset-revision`.
+- Record the checkpoint checksum.
+- Record the Python version and installed package versions from the Linux machine:
+
+```bash
+python --version
+python -m pip freeze > requirements-lock.txt
+```
+
+- Record the robot port, camera index, CUDA version, GPU model, and FFmpeg codec.
