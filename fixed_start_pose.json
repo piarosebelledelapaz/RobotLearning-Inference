@@ -1,0 +1,29 @@
+{
+  "source_dataset": "dataset/so101_plain",
+  "method": "median_first_frame_over_270_episodes",
+  "units": "degrees_for_arm_joints_and_0_to_100_for_gripper",
+  "pose": {
+    "shoulder_pan.pos": 0.791,
+    "shoulder_lift.pos": -6.066,
+    "elbow_flex.pos": 27.692,
+    "wrist_flex.pos": 50.418,
+    "wrist_roll.pos": 90.857,
+    "gripper.pos": 14.073
+  },
+  "mean_first_frame_pose": {
+    "shoulder_pan.pos": 0.906,
+    "shoulder_lift.pos": -6.154,
+    "elbow_flex.pos": 26.647,
+    "wrist_flex.pos": 50.179,
+    "wrist_roll.pos": 90.252,
+    "gripper.pos": 16.614
+  },
+  "std_first_frame_pose": {
+    "shoulder_pan.pos": 5.039,
+    "shoulder_lift.pos": 9.197,
+    "elbow_flex.pos": 12.854,
+    "wrist_flex.pos": 10.727,
+    "wrist_roll.pos": 6.917,
+    "gripper.pos": 12.609
+  }
+}
