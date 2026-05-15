@@ -1,1 +1,1 @@
-python -c "from huggingface_hub import HfApi; api=HfApi(); print('model:', api.model_info('piarosebelledelapaz/multitask_dit_so101plain_clippatch16_bs32').sha); print('dataset:', api.dataset_info('Robot-Learning-Group45/so101_plain').sha)"
+python -c "from huggingface_hub import HfApi; files=HfApi().list_repo_files('piarosebelledelapaz/multitask_dit_so101plain_clippatch16_bs32', repo_type='model'); print('\n'.join(f for f in files if '030000' in f or 'pretrained_model' in f or 'model.safetensors' in f))"
