@@ -1,0 +1,1 @@
+python -c "from huggingface_hub import HfApi; api=HfApi(); print('model:', api.model_info('piarosebelledelapaz/multitask_dit_so101plain_clippatch16_bs32').sha); print('dataset:', api.dataset_info('Robot-Learning-Group45/so101_plain').sha)"
