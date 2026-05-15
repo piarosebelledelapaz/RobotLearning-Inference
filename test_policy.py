@@ -22,9 +22,19 @@ parser.add_argument("--robot-id", default=os.environ.get("ROBOT_ID", "robot_lear
 parser.add_argument("--camera-index", default=os.environ.get("CAMERA_INDEX", "0"))
 parser.add_argument("--camera-fps", type=int, default=int(os.environ.get("CAMERA_FPS", "30")))
 parser.add_argument("--device", default=os.environ.get("POLICY_DEVICE", "cuda"))
-parser.add_argument("--vcodec", default=os.environ.get("DATASET_VCODEC", "libx264"))
+parser.add_argument("--vcodec", default=os.environ.get("DATASET_VCODEC", "h264"))
 parser.add_argument("--num-episodes", type=int, default=int(os.environ.get("NUM_EPISODES", "1")))
 args = parser.parse_args()
+
+policy_path = args.policy_path
+candidate_policy_path = Path(policy_path).expanduser()
+if candidate_policy_path.exists():
+    policy_path = str(candidate_policy_path.resolve())
+elif "/" in policy_path or "\\" in policy_path:
+    raise FileNotFoundError(
+        f"Policy path does not exist: {policy_path}. "
+        "Pass the folder that contains config.json and model.safetensors."
+    )
 
 camera_config = (
     "{ wrist: {type: opencv, index_or_path: "
@@ -48,7 +58,7 @@ cmd = [
     "--dataset.push_to_hub=false",
     f"--dataset.vcodec={args.vcodec}",
     f"--policy.device={args.device}",
-    f"--policy.path={args.policy_path}",
+    f"--policy.path={policy_path}",
 ]
 
 subprocess.run(cmd, check=True)
