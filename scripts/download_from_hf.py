@@ -9,6 +9,7 @@ def download_snapshot(
     repo_type: str,
     revision: str,
     local_dir: Path,
+    allow_patterns: list[str] | None = None,
 ) -> None:
     local_dir.mkdir(parents=True, exist_ok=True)
     snapshot_download(
@@ -17,6 +18,7 @@ def download_snapshot(
         revision=revision,
         local_dir=local_dir,
         local_dir_use_symlinks=False,
+        allow_patterns=allow_patterns,
     )
 
 
@@ -26,6 +28,11 @@ def main() -> None:
     )
     parser.add_argument("--policy-repo-id", required=True)
     parser.add_argument("--policy-revision", required=True)
+    parser.add_argument(
+        "--policy-allow-pattern",
+        action="append",
+        help="Only download matching policy files. Can be passed multiple times.",
+    )
     parser.add_argument("--dataset-repo-id")
     parser.add_argument("--dataset-revision")
     parser.add_argument(
@@ -45,6 +52,7 @@ def main() -> None:
         repo_type="model",
         revision=args.policy_revision,
         local_dir=args.policy_dir,
+        allow_patterns=args.policy_allow_pattern,
     )
 
     if args.dataset_repo_id:

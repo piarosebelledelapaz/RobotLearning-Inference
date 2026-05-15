@@ -79,8 +79,12 @@ Patch16 batch32 checkpoint, which matches the default inference path:
 python scripts/download_from_hf.py \
   --policy-repo-id piarosebelledelapaz/multitask_dit_so101plain_clippatch16_bs32 \
   --policy-revision <patch16-model-commit-hash> \
+  --policy-allow-pattern "checkpoints/030000/pretrained_model/*" \
   --policy-dir artifacts/policies/clippatch16_batch32_030000
 ```
+
+If the downloaded files keep the Hugging Face folder structure, run inference
+with `artifacts/policies/clippatch16_batch32_030000/checkpoints/030000/pretrained_model`.
 
 Patch32 batch64 checkpoint:
 
