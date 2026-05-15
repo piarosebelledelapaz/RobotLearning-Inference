@@ -68,24 +68,37 @@ sudo apt-get update
 sudo apt-get install -y v4l-utils
 ```
 
-4. Download the checkpoint from Hugging Face into `artifacts/policies/clippatch16_batch32_030000/`.
+4. Download the checkpoint from Hugging Face into `artifacts/policies/`.
 
 Use exact Hugging Face revisions, preferably commit hashes, not floating branch
 names like `main`.
 
+Patch16 batch32 checkpoint, which matches the default inference path:
+
 ```bash
 python scripts/download_from_hf.py \
-  --policy-repo-id piarosebelledelapaz/multitask-dit-so101-plain \
-  --policy-revision <model-commit-hash>
+  --policy-repo-id piarosebelledelapaz/multitask_dit_so101plain_clippatch16_bs32 \
+  --policy-revision <patch16-model-commit-hash> \
+  --policy-dir artifacts/policies/clippatch16_batch32_030000
+```
+
+Patch32 batch64 checkpoint:
+
+```bash
+python scripts/download_from_hf.py \
+  --policy-repo-id piarosebelledelapaz/multitask_dit_so101plain_clippatch32_bs64 \
+  --policy-revision <patch32-model-commit-hash> \
+  --policy-dir artifacts/policies/clippatch32_batch64
 ```
 
 If you also need the dataset locally, download it in the same reproducible step:
 
 ```bash
 python scripts/download_from_hf.py \
-  --policy-repo-id piarosebelledelapaz/multitask-dit-so101-plain \
-  --policy-revision <model-commit-hash> \
-  --dataset-repo-id <your-hf-username-or-org>/<dataset-repo-name> \
+  --policy-repo-id piarosebelledelapaz/multitask_dit_so101plain_clippatch16_bs32 \
+  --policy-revision <patch16-model-commit-hash> \
+  --policy-dir artifacts/policies/clippatch16_batch32_030000 \
+  --dataset-repo-id Robot-Learning-Group45/so101_plain \
   --dataset-revision <dataset-commit-hash>
 ```
 
