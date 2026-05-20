@@ -18,7 +18,6 @@ START_DURATION_S="${START_DURATION_S:-3.0}"
 DISPLAY_DATA="${DISPLAY_DATA:-true}"
 TASK_NAME="${TASK_NAME:-Towel folding}"
 DATASET_PREFIX="${DATASET_PREFIX:-eval_towel_folding}"
-EPISODE_TIME_S="${EPISODE_TIME_S:-}"
 
 if ! command -v conda >/dev/null 2>&1; then
   echo "conda was not found on PATH. Install Miniconda/Anaconda first." >&2
@@ -33,11 +32,6 @@ fi
 
 eval "$(conda shell.bash hook)"
 conda activate "$ENV_NAME"
-
-policy_extra_args=()
-if [ -n "$EPISODE_TIME_S" ]; then
-  policy_extra_args+=(--episode-time-s "$EPISODE_TIME_S")
-fi
 
 for rollout in $(seq 1 "$NUM_ROLLOUTS"); do
   printf "\n=== Rollout %s/%s: moving to start pose ===\n" "$rollout" "$NUM_ROLLOUTS"
@@ -59,8 +53,7 @@ for rollout in $(seq 1 "$NUM_ROLLOUTS"); do
     --display-data "$DISPLAY_DATA" \
     --task-name "$TASK_NAME" \
     --dataset-name "${DATASET_PREFIX}_rollout_${rollout}" \
-    --num-episodes 1 \
-    "${policy_extra_args[@]}"
+    --num-episodes 1
 
   printf "\n=== Rollout %s/%s: finished ===\n" "$rollout" "$NUM_ROLLOUTS"
 done
