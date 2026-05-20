@@ -24,6 +24,8 @@ parser.add_argument("--camera-fps", type=int, default=int(os.environ.get("CAMERA
 parser.add_argument("--device", default=os.environ.get("POLICY_DEVICE", "cuda"))
 parser.add_argument("--vcodec", default=os.environ.get("DATASET_VCODEC", "h264"))
 parser.add_argument("--num-episodes", type=int, default=int(os.environ.get("NUM_EPISODES", "1")))
+parser.add_argument("--display-data", default=os.environ.get("DISPLAY_DATA", "true"))
+parser.add_argument("--task-name", default=os.environ.get("TASK_NAME", "Towel folding"))
 args = parser.parse_args()
 
 policy_path = args.policy_path
@@ -50,10 +52,10 @@ cmd = [
     f"--robot.id={args.robot_id}",
     "--robot.calibration_dir=calibration",
     f"--robot.cameras={camera_config}",
-    "--display_data=false",
+    f"--display_data={args.display_data}",
     "--play_sounds=false",
     f"--dataset.repo_id=local/{args.dataset_name}_{run_id}",
-    "--dataset.single_task=Towel folding",
+    f"--dataset.single_task={args.task_name}",
     f"--dataset.num_episodes={args.num_episodes}",
     "--dataset.push_to_hub=false",
     f"--dataset.vcodec={args.vcodec}",
