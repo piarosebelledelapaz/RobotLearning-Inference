@@ -26,6 +26,11 @@ parser.add_argument("--vcodec", default=os.environ.get("DATASET_VCODEC", "h264")
 parser.add_argument("--num-episodes", type=int, default=int(os.environ.get("NUM_EPISODES", "1")))
 parser.add_argument("--display-data", default=os.environ.get("DISPLAY_DATA", "true"))
 parser.add_argument("--task-name", default=os.environ.get("TASK_NAME", "Towel folding"))
+parser.add_argument(
+    "--episode-time-s",
+    type=float,
+    default=float(os.environ["EPISODE_TIME_S"]) if os.environ.get("EPISODE_TIME_S") else None,
+)
 args = parser.parse_args()
 
 policy_path = args.policy_path
@@ -62,6 +67,9 @@ cmd = [
     f"--policy.device={args.device}",
     f"--policy.path={policy_path}",
 ]
+
+if args.episode_time_s is not None:
+    cmd.append(f"--dataset.episode_time_s={args.episode_time_s}")
 
 subprocess.run(cmd, check=True)
 
