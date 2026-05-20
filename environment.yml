@@ -9,5 +9,5 @@ dependencies:
   - pip
   - ffmpeg
   - pip:
-      - "lerobot[multi_task_dit]"
+      - "lerobot[multi_task_dit,feetech]"
       - huggingface_hub
