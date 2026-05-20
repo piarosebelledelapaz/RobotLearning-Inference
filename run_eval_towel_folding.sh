@@ -17,6 +17,7 @@ START_DURATION_S="${START_DURATION_S:-3.0}"
 DISPLAY_DATA="${DISPLAY_DATA:-true}"
 TASK_NAME="${TASK_NAME:-Towel folding}"
 DATASET_PREFIX="${DATASET_PREFIX:-eval_towel_folding}"
+WAIT_FOR_ENTER="${WAIT_FOR_ENTER:-true}"
 
 if ! command -v conda >/dev/null 2>&1; then
   echo "conda was not found on PATH. Install Miniconda/Anaconda first." >&2
@@ -52,4 +53,9 @@ for rollout in $(seq 1 "$NUM_ROLLOUTS"); do
     --task-name "$TASK_NAME" \
     --dataset-name "${DATASET_PREFIX}_rollout_${rollout}" \
     --num-episodes 1
+
+  printf "\n=== Rollout %s/%s: finished ===\n" "$rollout" "$NUM_ROLLOUTS"
+  if [ "$WAIT_FOR_ENTER" = "true" ] && [ "$rollout" -lt "$NUM_ROLLOUTS" ]; then
+    read -r -p "Press Enter to move to the start pose for the next rollout..."
+  fi
 done
