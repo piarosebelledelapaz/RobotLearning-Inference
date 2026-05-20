@@ -61,6 +61,12 @@ conda env create -f environment.yml
 conda activate robotlearning-inference
 ```
 
+If the environment already exists and `environment.yml` changed, update it:
+
+```bash
+conda env update -n robotlearning-inference -f environment.yml --prune
+```
+
 3. Install FFmpeg and camera/USB support.
 
 ```bash
@@ -127,7 +133,15 @@ v4l2-ctl --list-devices
 python move_to_start_pose.py --port /dev/ttyACM0
 ```
 
-7. Run inference.
+7. Preview what the fixed start pose sees.
+
+```bash
+python preview_camera.py --camera-index 0 --fps 20
+```
+
+Press `s` to save a frame and `q` to close the preview.
+
+8. Run inference.
 
 ```bash
 python test_policy.py \
@@ -135,11 +149,47 @@ python test_policy.py \
   --camera-index 0 \
   --policy-path artifacts/policies/clippatch16_batch32_030000 \
   --device cuda \
-  --vcodec libx264
+  --vcodec h264
 ```
 
 Use `--vcodec h264_nvenc` only on machines where FFmpeg can see an NVIDIA
-hardware encoder. `libx264` is slower but more portable.
+hardware encoder. `h264` is slower but more portable.
+
+For repeated evaluation rollouts where the arm should return to the fixed start
+pose before every rollout, run:
+
+```bash
+NUM_ROLLOUTS=5 bash run_eval_towel_folding.sh
+```
+
+The script alternates:
+
+```text
+move_to_start_pose.py
+test_policy.py --num-episodes 1
+move_to_start_pose.py
+test_policy.py --num-episodes 1
+...
+```
+
+By default, the script waits for you to press Enter between rollouts. This is
+useful over SSH when you want to inspect/reset the scene manually before the arm
+moves again. For unattended runs, disable the pause:
+
+```bash
+WAIT_FOR_ENTER=false NUM_ROLLOUTS=5 bash run_eval_towel_folding.sh
+```
+
+Its Linux defaults match the lab inference setup:
+
+```bash
+ROBOT_PORT=/dev/ttyACM0
+CAMERA_INDEX=0
+CAMERA_FPS=20
+POLICY_PATH=artifacts/policies/clippatch16_batch32/checkpoints/030000/pretrained_model
+POLICY_DEVICE=cuda
+DATASET_VCODEC=h264_nvenc
+```
 
 ## Environment variables
 
@@ -152,7 +202,7 @@ export ROBOT_ID=robot_learning_follower
 export CAMERA_INDEX=0
 export CAMERA_FPS=30
 export POLICY_DEVICE=cuda
-export DATASET_VCODEC=libx264
+export DATASET_VCODEC=h264
 python test_policy.py
 ```
 
